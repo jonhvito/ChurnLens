@@ -1,0 +1,217 @@
+ChurnLens Flask Application - Estrutura Completa
+================================================
+
+churnlens/
+│
+├── 🚀 ENTRYPOINT
+│   └── run.py                          # Inicia servidor Flask
+│
+├── 📦 DEPENDÊNCIAS
+│   └── requirements.txt                # Flask + Pandas
+│
+├── 📚 DOCUMENTAÇÃO
+│   ├── README.md                       # Documentação completa
+│   ├── MIGRATION.md                    # Guia de migração (app.py → Flask)
+│   ├── QUICKSTART.md                   # Quick start guide
+│   ├── PROJECT_SUMMARY.md              # Resumo do projeto
+│   └── .gitignore                      # Git ignore
+│
+├── 🎯 APPLICATION (app/)
+│   │
+│   ├── __init__.py                     # Flask factory (create_app)
+│   ├── config.py                       # Configurações centralizadas
+│   ├── web.py                          # Blueprint: rotas web (HTML)
+│   └── api.py                          # Blueprint: rotas API (JSON + CSV)
+│   │
+│   ├── 🧠 CORE (Lógica Pura - Zero I/O)
+│   │   ├── __init__.py
+│   │   ├── pipeline.py                 # ⭐ 13 funções do pipeline RFM
+│   │   │                                 - clean_orders()
+│   │   │                                 - clean_payments()
+│   │   │                                 - aggregate_payments_by_order()
+│   │   │                                 - join_datasets()
+│   │   │                                 - compute_customer_features()
+│   │   │                                 - add_churn_label()
+│   │   │                                 - qcut_safe()
+│   │   │                                 - compute_rfm_scores()
+│   │   │                                 - compute_risk_segments()
+│   │   │                                 - run_pipeline()
+│   │   │
+│   │   ├── validation.py               # Validação de schemas CSV
+│   │   │                                 - validate_customers_schema()
+│   │   │                                 - validate_orders_schema()
+│   │   │                                 - validate_payments_schema()
+│   │   │                                 - validate_datasets()
+│   │   │
+│   │   └── schemas.py                  # Dataclasses e estruturas
+│   │                                     - KPIs
+│   │                                     - RFMChurnData
+│   │                                     - RiskSegmentData
+│   │                                     - TopRiskCustomer
+│   │
+│   └── 🔧 SERVICES (I/O + Cache)
+│       ├── __init__.py
+│       └── data_service.py             # DataService class
+│                                         - load_raw_data()
+│                                         - get_features() [com cache]
+│                                         - get_kpis()
+│                                         - get_churn_by_rfm()
+│                                         - get_recency_histogram()
+│                                         - get_risk_summary()
+│                                         - get_top_risk()
+│                                         - get_all_features()
+│
+├── 🎨 FRONTEND
+│   │
+│   ├── 📄 TEMPLATES (Jinja2)
+│   │   ├── base.html                   # Template base (header, footer)
+│   │   ├── dashboard.html              # Dashboard principal
+│   │   └── error.html                  # Página de erro
+│   │
+│   └── 📦 STATIC ASSETS
+│       ├── css/
+│       │   └── app.css                 # CSS customizado
+│       │
+│       └── js/
+│           └── dashboard.js            # Chart.js + fetch API
+│                                         - loadChurnByRFM()
+│                                         - loadRecencyHist()
+│                                         - loadTopRiskTable()
+│
+└── 🧪 TESTES
+    ├── __init__.py
+    └── test_pipeline.py                # 6 testes unitários
+                                          ✓ test_churn_label_threshold
+                                          ✓ test_rfm_score_range
+                                          ✓ test_no_negative_monetary
+                                          ✓ test_clean_orders_removes_invalid
+                                          ✓ test_aggregate_payments_sums_correctly
+                                          ✓ test_qcut_safe_handles_duplicates
+
+
+📊 DADOS (../data/)
+├── olist_customers_dataset.csv         # ~99k linhas
+├── olist_orders_dataset.csv            # ~99k linhas
+└── olist_order_payments_dataset.csv    # ~104k linhas
+
+
+🌐 ENDPOINTS DISPONÍVEIS
+=========================
+
+WEB (HTML)
+----------
+GET  /                  → Dashboard principal
+GET  /health            → Health check
+
+API (JSON)
+----------
+GET  /api/summary       → KPIs gerais
+GET  /api/churn_by_rfm  → Churn rate por RFM score
+GET  /api/recency_hist  → Histograma de recency (bins)
+GET  /api/risk_summary  → Resumo por segmento de risco
+GET  /api/top_risk      → Top 50 clientes em risco
+
+EXPORT (CSV)
+------------
+GET  /export/customers.csv  → Todas features de clientes
+GET  /export/top_risk.csv   → Top 50 clientes em risco
+
+
+🔧 CONFIGURAÇÃO (Variáveis de Ambiente)
+========================================
+CHURN_THRESHOLD_DAYS    → Dias para considerar churn (default: 270)
+FLASK_DEBUG             → Debug mode (default: True)
+FLASK_HOST              → Host (default: 0.0.0.0)
+FLASK_PORT              → Porta (default: 5000)
+CACHE_ENABLED           → Ativar cache (default: True)
+
+
+📈 PIPELINE DE ANÁLISE
+======================
+1. Carregar CSVs (customers, orders, payments)
+2. Validar schemas
+3. Limpar dados (nulls, duplicatas, valores inválidos)
+4. Agregar pagamentos por pedido
+5. Join datasets (customer_id, order_id)
+6. Calcular features RFM por cliente:
+   - Recency (dias desde última compra)
+   - Frequency (número de pedidos)
+   - Monetary (receita total)
+   - Tenure (dias desde primeira compra)
+   - Avg Ticket (ticket médio)
+7. Aplicar label de churn (recency >= threshold)
+8. Calcular RFM scores (quintis 1-5)
+9. Segmentar por risco (regras de negócio)
+10. Cachear resultado
+
+
+🎯 PRINCÍPIOS APLICADOS
+========================
+✓ Clean Code
+  - Funções pequenas e focadas
+  - Nomes descritivos
+  - DRY (Don't Repeat Yourself)
+  - KISS (Keep It Simple)
+
+✓ Separation of Concerns
+  - Core: lógica pura
+  - Services: I/O e cache
+  - Web/API: apresentação
+  - Templates: UI
+
+✓ Testability
+  - Funções puras (sem side effects)
+  - Injeção de dependências
+  - Mocks fáceis
+
+✓ SOLID
+  - Single Responsibility
+  - Open/Closed
+  - Dependency Inversion
+
+✓ Imutabilidade
+  - Funções retornam novos DataFrames
+  - Não modificam inputs
+
+
+📊 ESTATÍSTICAS
+================
+Total de arquivos: 24
+Linhas de código: ~1.500
+Testes: 6 (100% passando)
+Cobertura: Core pipeline
+
+Antes: 1 arquivo, 163 linhas, 0 testes
+Depois: 24 arquivos, bem organizados, 6 testes
+
+
+🚀 COMANDOS RÁPIDOS
+===================
+# Instalar
+pip install -r requirements.txt
+
+# Rodar
+python run.py
+
+# Testar
+pytest tests/ -v
+
+# Acessar
+http://localhost:5000
+
+
+✨ FEATURES IMPLEMENTADAS
+==========================
+✓ Dashboard web interativo
+✓ Gráficos Chart.js (churn por RFM, recency hist)
+✓ Tabela top 50 clientes em risco
+✓ API REST (JSON)
+✓ Export CSV
+✓ Cache de resultados
+✓ Validação de dados
+✓ Tratamento de erros
+✓ Design responsivo (Tailwind)
+✓ Testes unitários
+✓ Documentação completa
+
+
