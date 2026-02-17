@@ -1,0 +1,20 @@
+services:
+  churnlens:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_HOST=0.0.0.0
+      - FLASK_PORT=5000
+      - FLASK_DEBUG=False
+      - CHURN_THRESHOLD_DAYS=270
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          memory: 64M

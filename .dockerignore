@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentação
+*.md
+ANALISE.md
+BUGFIX_INFINITE_GROWTH.md
+DOCUMENTACAO_MELHORIAS.md
+MIGRATION.md
+PROJECT_STRUCTURE.txt
+PROJECT_SUMMARY.md
+QUICKSTART.md
+README.md
+
+# Testes
+tests/
+test_*.py
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
