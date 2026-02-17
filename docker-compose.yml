@@ -8,6 +8,7 @@ services:
       - FLASK_PORT=5000
       - FLASK_DEBUG=False
       - CHURN_THRESHOLD_DAYS=270
+      - CLOUDFLARE_TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     volumes:
       - ./data:/app/data
     restart: unless-stopped

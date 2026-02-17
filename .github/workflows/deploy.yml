@@ -1,0 +1,50 @@
+name: Deploy to Homelab
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: self-hosted
+    
+    steps:
+      - name: 📥 Checkout código
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Verificar Docker
+        run: |
+          docker --version
+          docker compose version
+      
+      - name: 🛑 Parar containers antigos
+        run: |
+          docker compose down || true
+        continue-on-error: true
+      
+      - name: 🏗️ Build da imagem
+        run: |
+          docker compose build --no-cache
+      
+      - name: 🚀 Deploy da aplicação
+        run: |
+          docker compose up -d
+      
+      - name: 📊 Verificar status
+        run: |
+          sleep 5
+          docker compose ps
+          docker compose logs --tail 20
+      
+      - name: 🧹 Limpar imagens antigas
+        run: |
+          docker image prune -f
+        continue-on-error: true
+      
+      - name: ✅ Deploy concluído
+        run: |
+          echo "🎉 Deploy realizado com sucesso!"
+          echo "🌐 Aplicação disponível em: https://churnlens.jonhvito.com.br"

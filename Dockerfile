@@ -12,6 +12,16 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Instalar cloudflared
+RUN apt-get update && \
+    apt-get install -y wget && \
+    wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && \
+    dpkg -i cloudflared-linux-amd64.deb && \
+    rm cloudflared-linux-amd64.deb && \
+    apt-get remove -y wget && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
+
 # Criar usuário não-root primeiro
 RUN useradd -m -u 1000 appuser
 
@@ -24,6 +34,10 @@ COPY --chown=appuser:appuser data/ ./data/
 COPY --chown=appuser:appuser static/ ./static/
 COPY --chown=appuser:appuser templates/ ./templates/
 COPY --chown=appuser:appuser run.py .
+COPY --chown=appuser:appuser entrypoint.sh .
+
+# Dar permissão de execução ao entrypoint
+RUN chmod +x entrypoint.sh
 
 # Mudar para usuário não-root
 USER appuser
@@ -34,5 +48,5 @@ ENV PATH=/home/appuser/.local/bin:$PATH
 # Expor a porta
 EXPOSE 5000
 
-# Rodar aplicação
-CMD ["python", "run.py"]
+# Rodar aplicação via entrypoint
+CMD ["./entrypoint.sh"]
