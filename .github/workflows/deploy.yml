@@ -12,8 +12,12 @@ jobs:
     runs-on: self-hosted
     
     steps:
-      - name: 📥 Checkout código
-        uses: actions/checkout@v4
+      - name: 📥 Atualizar código
+        run: |
+          cd /home/jonh/apps/ChurnLens
+          git fetch origin
+          git reset --hard origin/main
+          git clean -fd
       
       - name: 🔧 Verificar Docker
         run: |
@@ -22,19 +26,23 @@ jobs:
       
       - name: 🛑 Parar containers antigos
         run: |
+          cd /home/jonh/apps/ChurnLens
           docker compose down || true
         continue-on-error: true
       
       - name: 🏗️ Build da imagem
         run: |
+          cd /home/jonh/apps/ChurnLens
           docker compose build --no-cache
       
       - name: 🚀 Deploy da aplicação
         run: |
+          cd /home/jonh/apps/ChurnLens
           docker compose up -d
       
       - name: 📊 Verificar status
         run: |
+          cd /home/jonh/apps/ChurnLens
           sleep 5
           docker compose ps
           docker compose logs --tail 20
