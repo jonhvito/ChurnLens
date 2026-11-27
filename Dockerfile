@@ -15,7 +15,8 @@ WORKDIR /app
 # Instalar cloudflared
 RUN apt-get update && \
     apt-get install -y wget && \
-    wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && \
+    wget -q https://github.com/cloudflare/cloudflared/releases/download/2026.11.2/cloudflared-linux-amd64.deb && \
+    echo '420c785222100e1e6bf9f692aca24ce0971d7918f642c52cf8ad8b6af5b41d2d  cloudflared-linux-amd64.deb' | sha256sum -c - && \
     dpkg -i cloudflared-linux-amd64.deb && \
     rm cloudflared-linux-amd64.deb && \
     apt-get remove -y wget && \
